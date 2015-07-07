@@ -12,7 +12,7 @@ namespace WorldEdit.Commands
 
 		public override void Execute()
 		{
-			string clipboardPath = Tools.GetClipboardPath(plr.UserAccountName);
+			string clipboardPath = Tools.GetClipboardPath(plr.User.Name);
 			Tools.SaveWorldSection(x, y, x2, y2, clipboardPath);
 
 			plr.SendSuccessMessage("Copied selection to clipboard.");

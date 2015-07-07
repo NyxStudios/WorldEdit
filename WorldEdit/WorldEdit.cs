@@ -263,7 +263,7 @@ namespace WorldEdit
 
 			var sqlcreator = new SqlTableCreator(Database,
 				Database.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryCreator() : new MysqlQueryCreator());
-			sqlcreator.EnsureExists(new SqlTable("WorldEdit",
+			sqlcreator.EnsureTableStructure(new SqlTable("WorldEdit",
 				new SqlColumn("Account", MySqlDbType.VarChar) { Primary = true, Length = 50 },
 				new SqlColumn("RedoLevel", MySqlDbType.Int32),
 				new SqlColumn("UndoLevel", MySqlDbType.Int32)));
@@ -491,7 +491,7 @@ namespace WorldEdit
 		{
 			if (e.Parameters.Count != 1)
 				e.Player.SendErrorMessage("Invalid syntax! Proper syntax: //flip <direction>");
-			else if (!Tools.HasClipboard(e.Player.UserAccountName))
+			else if (!Tools.HasClipboard(e.Player.User.Name))
 				e.Player.SendErrorMessage("Invalid clipboard!");
 			else
 			{
@@ -614,7 +614,7 @@ namespace WorldEdit
 			e.Player.SendInfoMessage("X: {0}, Y: {1}", info.X, info.Y);
 			if (info.X == -1 || info.Y == -1)
 				e.Player.SendErrorMessage("Invalid first point!");
-			else if (!Tools.HasClipboard(e.Player.UserAccountName))
+			else if (!Tools.HasClipboard(e.Player.User.Name))
 				e.Player.SendErrorMessage("Invalid clipboard!");
 			else
 			{
@@ -727,7 +727,7 @@ namespace WorldEdit
 			if (e.Parameters.Count > 0 && (!int.TryParse(e.Parameters[0], out steps) || steps <= 0))
 				e.Player.SendErrorMessage("Invalid redo steps '{0}'!", e.Parameters[0]);
 			else
-				CommandQueue.Add(new Redo(e.Player, e.Parameters.Count > 1 ? e.Parameters[1] : e.Player.UserAccountName, steps));
+				CommandQueue.Add(new Redo(e.Player, e.Parameters.Count > 1 ? e.Parameters[1] : e.Player.User.Name, steps));
 		}
 		void RegionCmd(CommandArgs e)
 		{
@@ -824,7 +824,7 @@ namespace WorldEdit
 				e.Player.SendErrorMessage("Invalid syntax! Proper syntax: //rotate <angle>");
 				return;
 			}
-			if (!Tools.HasClipboard(e.Player.UserAccountName))
+			if (!Tools.HasClipboard(e.Player.User.Name))
 			{
 				e.Player.SendErrorMessage("Invalid clipboard!");
 				return;
@@ -902,7 +902,7 @@ namespace WorldEdit
 							return;
 						}
 
-						string clipboardPath = Path.Combine("worldedit", String.Format("clipboard-{0}.dat", e.Player.UserAccountName));
+						string clipboardPath = Path.Combine("worldedit", String.Format("clipboard-{0}.dat", e.Player.User.Name));
 						File.Copy(schematicPath, clipboardPath, true);
 						e.Player.SendSuccessMessage("Loaded schematic '{0}' to clipboard.", e.Parameters[1]);
 					}
@@ -914,7 +914,7 @@ namespace WorldEdit
 							e.Player.SendErrorMessage("Invalid syntax! Proper syntax: //schematic save <name>");
 							return;
 						}
-						string clipboardPath = Path.Combine("worldedit", String.Format("clipboard-{0}.dat", e.Player.UserAccountName));
+						string clipboardPath = Path.Combine("worldedit", String.Format("clipboard-{0}.dat", e.Player.User.Name));
 						if (!File.Exists(clipboardPath))
 						{
 							e.Player.SendErrorMessage("Invalid clipboard!");
@@ -1118,7 +1118,7 @@ namespace WorldEdit
 			if (e.Parameters.Count > 0 && (!int.TryParse(e.Parameters[0], out steps) || steps <= 0))
 				e.Player.SendErrorMessage("Invalid undo steps '{0}'!", e.Parameters[0]);
 			else
-				CommandQueue.Add(new Undo(e.Player, e.Parameters.Count > 1 ? e.Parameters[1] : e.Player.UserAccountName, steps));
+				CommandQueue.Add(new Undo(e.Player, e.Parameters.Count > 1 ? e.Parameters[1] : e.Player.User.Name, steps));
 		}
 	}
 }

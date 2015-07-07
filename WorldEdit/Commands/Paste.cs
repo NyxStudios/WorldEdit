@@ -21,7 +21,7 @@ namespace WorldEdit.Commands
 
 		public override void Execute()
 		{
-			string clipboardPath = Tools.GetClipboardPath(plr.UserAccountName);
+			string clipboardPath = Tools.GetClipboardPath(plr.User.Name);
 			using (var reader = new BinaryReader(new GZipStream(new FileStream(clipboardPath, FileMode.Open), CompressionMode.Decompress)))
 			{
 				reader.ReadInt32();
