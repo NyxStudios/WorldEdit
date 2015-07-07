@@ -120,25 +120,25 @@ namespace WorldEdit
 		public static void PrepareUndo(int x, int y, int x2, int y2, TSPlayer plr)
 		{
 			if (WorldEdit.Database.GetSqlType() == SqlType.Mysql)
-				WorldEdit.Database.Query("INSERT IGNORE INTO WorldEdit VALUES (@0, -1, -1)", plr.UserAccountName);
+				WorldEdit.Database.Query("INSERT IGNORE INTO WorldEdit VALUES (@0, -1, -1)", plr.User.Name);
 			else
-				WorldEdit.Database.Query("INSERT OR IGNORE INTO WorldEdit VALUES (@0, 0, 0)", plr.UserAccountName);
-			WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = -1 WHERE Account = @0", plr.UserAccountName);
-			WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = UndoLevel + 1 WHERE Account = @0", plr.UserAccountName);
+				WorldEdit.Database.Query("INSERT OR IGNORE INTO WorldEdit VALUES (@0, 0, 0)", plr.User.Name);
+			WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = -1 WHERE Account = @0", plr.User.Name);
+			WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = UndoLevel + 1 WHERE Account = @0", plr.User.Name);
 
 			int undoLevel = 0;
-			using (var reader = WorldEdit.Database.QueryReader("SELECT UndoLevel FROM WorldEdit WHERE Account = @0", plr.UserAccountName))
+			using (var reader = WorldEdit.Database.QueryReader("SELECT UndoLevel FROM WorldEdit WHERE Account = @0", plr.User.Name))
 			{
 				if (reader.Read())
 					undoLevel = reader.Get<int>("UndoLevel");
 			}
 
-			string path = Path.Combine("worldedit", String.Format("undo-{0}-{1}.dat", plr.UserAccountName, undoLevel));
+			string path = Path.Combine("worldedit", String.Format("undo-{0}-{1}.dat", plr.User.Name, undoLevel));
 			SaveWorldSection(x, y, x2, y2, path);
 
-			foreach (string fileName in Directory.EnumerateFiles("worldedit", String.Format("redo-{0}-*.dat", plr.UserAccountName)))
+			foreach (string fileName in Directory.EnumerateFiles("worldedit", String.Format("redo-{0}-*.dat", plr.User.Name)))
 				File.Delete(fileName);
-			File.Delete(Path.Combine("worldedit", String.Format("undo-{0}-{1}.dat", plr.UserAccountName, undoLevel - MAX_UNDOS)));
+			File.Delete(Path.Combine("worldedit", String.Format("undo-{0}-{1}.dat", plr.User.Name, undoLevel - MAX_UNDOS)));
 		}
 		public static Tile ReadTile(this BinaryReader reader)
 		{
@@ -206,12 +206,12 @@ namespace WorldEdit
 			int highX = Netplay.GetSectionX(x2);
 			int lowY = Netplay.GetSectionY(y);
 			int highY = Netplay.GetSectionY(y2);
-			foreach (ServerSock sock in Netplay.serverSock.Where(s => s.active))
+			foreach (RemoteClient sock in Netplay.Clients.Where(s => s.IsActive))
 			{
 				for (int i = lowX; i <= highX; i++)
 				{
 					for (int j = lowY; j <= highY; j++)
-						sock.tileSection[i, j] = false;
+						sock.TileSections[i, j] = false;
 				}
 			}
 		}

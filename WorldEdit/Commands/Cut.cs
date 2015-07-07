@@ -18,25 +18,25 @@ namespace WorldEdit.Commands
 
 		public override void Execute()
 		{
-			foreach (string fileName in Directory.EnumerateFiles("worldedit", String.Format("redo-{0}-*.dat", plr.UserAccountName)))
+			foreach (string fileName in Directory.EnumerateFiles("worldedit", String.Format("redo-{0}-*.dat", plr.User.Name)))
 				File.Delete(fileName);
 
 			if (WorldEdit.Database.GetSqlType() == SqlType.Mysql)
-				WorldEdit.Database.Query("INSERT IGNORE INTO WorldEdit VALUES (@0, -1, -1)", plr.UserAccountName);
+				WorldEdit.Database.Query("INSERT IGNORE INTO WorldEdit VALUES (@0, -1, -1)", plr.User.Name);
 			else
-				WorldEdit.Database.Query("INSERT OR IGNORE INTO WorldEdit VALUES (@0, 0, 0)", plr.UserAccountName);
-			WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = -1 WHERE Account = @0", plr.UserAccountName);
-			WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = UndoLevel + 1 WHERE Account = @0", plr.UserAccountName);
+				WorldEdit.Database.Query("INSERT OR IGNORE INTO WorldEdit VALUES (@0, 0, 0)", plr.User.Name);
+			WorldEdit.Database.Query("UPDATE WorldEdit SET RedoLevel = -1 WHERE Account = @0", plr.User.Name);
+			WorldEdit.Database.Query("UPDATE WorldEdit SET UndoLevel = UndoLevel + 1 WHERE Account = @0", plr.User.Name);
 
 			int undoLevel = 0;
-			using (var reader = WorldEdit.Database.QueryReader("SELECT UndoLevel FROM WorldEdit WHERE Account = @0", plr.UserAccountName))
+			using (var reader = WorldEdit.Database.QueryReader("SELECT UndoLevel FROM WorldEdit WHERE Account = @0", plr.User.Name))
 			{
 				if (reader.Read())
 					undoLevel = reader.Get<int>("UndoLevel");
 			}
 
-			string clipboardPath = Tools.GetClipboardPath(plr.UserAccountName);
-			string undoPath = Path.Combine("worldedit", String.Format("undo-{0}-{1}.dat", plr.UserAccountName, undoLevel));
+			string clipboardPath = Tools.GetClipboardPath(plr.User.Name);
+			string undoPath = Path.Combine("worldedit", String.Format("undo-{0}-{1}.dat", plr.User.Name, undoLevel));
 			// GZipStream is already buffered, but it's much faster to have a 1 MB buffer.
 			using (var writer =
 				new BinaryWriter(
