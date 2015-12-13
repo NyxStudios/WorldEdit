@@ -1070,11 +1070,6 @@ namespace WorldEdit
 			}
 
 			int amount;
-			if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
-			{
-				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[0]);
-				return;
-			}
 
 			foreach (char c in e.Parameters[1].ToLowerInvariant())
 			{
@@ -1100,11 +1095,17 @@ namespace WorldEdit
 				}
 				else
 				{
-					e.Player.SendErrorMessage("Invalid direction '{0}'!", c);
+					e.Player.SendErrorMessage("Invalid direction '{0}' use (u, d, l, r)!", c);
 					return;
 				}
 			}
-			e.Player.SendSuccessMessage("Shifted selection.");
+			
+			if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
+			{
+				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[1]);
+				return;
+			}
+			e.Player.SendSuccessMessage("Shifted selection {0} to the {1}.", e.Parameters[1], e.Parameters[0]);
 		}
 		void Undo(CommandArgs e)
 		{
