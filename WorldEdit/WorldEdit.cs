@@ -1102,10 +1102,10 @@ namespace WorldEdit
 			
 			if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
 			{
-				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[1]);
+				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[0]);
 				return;
 			}
-			e.Player.SendSuccessMessage("Shifted selection {0} to the {1}.", e.Parameters[1], e.Parameters[0]);
+			e.Player.SendSuccessMessage("Shifted selection {0} to the {1}.", c, e.Parameters[0]);
 		}
 		void Undo(CommandArgs e)
 		{
