@@ -1069,8 +1069,6 @@ namespace WorldEdit
 				return;
 			}
 
-			int amount;
-
 			foreach (char c in e.Parameters[1].ToLowerInvariant())
 			{
 				if (c == 'd')
@@ -1100,6 +1098,7 @@ namespace WorldEdit
 				}
 			}
 			
+			int amount;
 			if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
 			{
 				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[0]);
