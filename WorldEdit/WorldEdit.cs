@@ -231,6 +231,10 @@ namespace WorldEdit
 			{
 				HelpText = "Sets wires in the worldedit selection."
 			});
+			TShockAPI.Commands.ChatCommands.Add(new Command("worldedit.region.setactuator", SetActuator, "/setactuator")
+			{
+				HelpText = "Sets actuators in the worldedit selection."
+			});
 			TShockAPI.Commands.ChatCommands.Add(new Command("worldedit.selection.shift", Shift, "/shift")
 			{
 				HelpText = "Shifts the worldedit selection in a direction."
@@ -1055,6 +1059,40 @@ namespace WorldEdit
 			}
 			CommandQueue.Add(new SetWire(info.X, info.Y, info.X2, info.Y2, e.Player, wire, state, expression));
 		}
+	        void SetActuator(CommandArgs e)
+	        {
+	            if (e.Parameters.Count < 1)
+	            {
+	                e.Player.SendErrorMessage("Invalid syntax! Proper syntax: //setactuator <actuator state> [=> boolean expr...]");
+	                return;
+	            }
+	            PlayerInfo info = e.Player.GetPlayerInfo();
+	            if (info.X == -1 || info.Y == -1 || info.X2 == -1 || info.Y2 == -1)
+	            {
+	                e.Player.SendErrorMessage("Invalid selection!");
+	                return;
+	            }
+	
+	            bool state = false;
+	            if (String.Equals(e.Parameters[0], "on", StringComparison.CurrentCultureIgnoreCase))
+	                state = true;
+	            else if (!String.Equals(e.Parameters[0], "off", StringComparison.CurrentCultureIgnoreCase))
+	            {
+	                e.Player.SendErrorMessage("Invalid actuator state '{0}'!", e.Parameters[1]);
+	                return;
+	            }
+	
+	            Expression expression = null;
+	            if (e.Parameters.Count > 1)
+	            {
+	                if (!Parser.TryParseTree(e.Parameters.Skip(1), out expression))
+	                {
+	                    e.Player.SendErrorMessage("Invalid expression!");
+	                    return;
+	                }
+	            }
+	            CommandQueue.Add(new SetActuator(info.X, info.Y, info.X2, info.Y2, e.Player, state, expression));
+	        }
 		void Shift(CommandArgs e)
 		{
 			if (e.Parameters.Count != 2)
@@ -1066,13 +1104,6 @@ namespace WorldEdit
 			if (info.X == -1 || info.Y == -1 || info.X2 == -1 || info.Y2 == -1)
 			{
 				e.Player.SendErrorMessage("Invalid selection!");
-				return;
-			}
-
-			int amount;
-			if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
-			{
-				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[0]);
 				return;
 			}
 
@@ -1100,11 +1131,18 @@ namespace WorldEdit
 				}
 				else
 				{
-					e.Player.SendErrorMessage("Invalid direction '{0}'!", c);
+					e.Player.SendErrorMessage("Invalid direction '{0}' use (u, d, l, r)!", c);
 					return;
 				}
 			}
-			e.Player.SendSuccessMessage("Shifted selection.");
+			
+			int amount;
+			if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
+			{
+				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[0]);
+				return;
+			}
+			e.Player.SendSuccessMessage("Shifted selection {0} to the {1}.", c, e.Parameters[0]);
 		}
 		void Undo(CommandArgs e)
 		{
