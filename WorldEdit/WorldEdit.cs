@@ -100,7 +100,7 @@ namespace WorldEdit
 							}
 							else if (info.Point == 3)
 							{
-								List<string> regions = TShock.Regions.InAreaRegionName(x, y);
+								List<string> regions = TShock.Regions.InAreaRegionName(x, y).ToList();
 								if (regions.Count == 0)
 								{
 									TShock.Players[e.Msg.whoAmI].SendErrorMessage("No region exists there.");
@@ -231,7 +231,10 @@ namespace WorldEdit
 			{
 				HelpText = "Sets wires in the worldedit selection."
 			});
-			TShockAPI.Commands.ChatCommands.Add(new Command("worldedit.selection.shift", Shift, "/shift")
+            TShockAPI.Commands.ChatCommands.Add(new Command("worldedit.region.actuate",Actuate,"/actuate") {
+                HelpText = "Sets the actuate status in the worldedit selection."
+            });
+            TShockAPI.Commands.ChatCommands.Add(new Command("worldedit.selection.shift", Shift, "/shift")
 			{
 				HelpText = "Shifts the worldedit selection in a direction."
 			});
@@ -1055,7 +1058,37 @@ namespace WorldEdit
 			}
 			CommandQueue.Add(new SetWire(info.X, info.Y, info.X2, info.Y2, e.Player, wire, state, expression));
 		}
-		void Shift(CommandArgs e)
+        void Actuate(CommandArgs e) {
+            if(e.Parameters.Count == 0) {
+                e.Player.SendErrorMessage("Invalid syntax! Proper syntax: //actuate <status(on/off/reverse)> [=> boolean expr...]");
+                return;
+            }
+            PlayerInfo info = e.Player.GetPlayerInfo();
+            if(info.X == -1 || info.Y == -1 || info.X2 == -1 || info.Y2 == -1) {
+                e.Player.SendErrorMessage("Invalid selection!");
+                return;
+            }
+
+            int mode = 2; // initialized with 2 because i once thought that if user didn't give a specific value, you know..
+            var modeName = e.Parameters[0].ToLower();
+            if (modeName == "on")
+                mode = 0;
+            else if (modeName == "off")
+                mode = 1;
+            else if(modeName != "reverse") {
+                e.Player.SendErrorMessage("Invalid status! Proper: on, off, reverse");
+                return;
+            }
+            Expression expression = null;
+            if(e.Parameters.Count > 1) {
+                if(!Parser.TryParseTree(e.Parameters.Skip(1),out expression)) {
+                    e.Player.SendErrorMessage("Invalid expression!");
+                    return;
+                }
+            }
+            CommandQueue.Add(new Actuate(info.X,info.Y,info.X2,info.Y2,e.Player,mode,expression));
+        }
+        void Shift(CommandArgs e)
 		{
 			if (e.Parameters.Count != 2)
 			{
