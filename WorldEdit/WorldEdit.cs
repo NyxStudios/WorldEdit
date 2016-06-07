@@ -1169,7 +1169,7 @@ namespace WorldEdit
 			}
 
 			int amount;
-			if (!int.TryParse(e.Parameters[1], out amount) || amount < 0)
+			if (!int.TryParse(e.Parameters[0], out amount) || amount < 0)
 			{
 				e.Player.SendErrorMessage("Invalid shift amount '{0}'!", e.Parameters[0]);
 				return;
