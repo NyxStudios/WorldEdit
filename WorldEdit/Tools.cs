@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using OTAPI.Tile;
 using Terraria;
 using TShockAPI;
 using TShockAPI.DB;
@@ -235,7 +236,7 @@ namespace WorldEdit
 				}
 			}
 		}
-		public static void Write(this BinaryWriter writer, Tile tile)
+		public static void Write(this BinaryWriter writer, ITile tile)
 		{
 			writer.Write(tile.sTileHeader);
 			writer.Write(tile.bTileHeader);

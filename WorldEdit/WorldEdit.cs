@@ -7,10 +7,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using Microsoft.Xna.Framework;
 using Mono.Data.Sqlite;
 using MySql.Data.MySqlClient;
 using Terraria;
 using Terraria.ID;
+using Terraria.Utilities;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.DB;
@@ -22,7 +24,7 @@ namespace WorldEdit
 {
 	public delegate bool Selection(int i, int j, TSPlayer player);
 
-	[ApiVersion(1, 25)]
+	[ApiVersion(2, 0)]
 	public class WorldEdit : TerrariaPlugin
 	{
 		public static Dictionary<string, int[]> Biomes = new Dictionary<string, int[]>();
@@ -379,8 +381,9 @@ namespace WorldEdit
 			for (int i = -48; i < Main.maxItemTypes; i++)
 			{
 				item.netDefaults(i);
+				var name = Lang.itemName(i, true);
 				if (item.paint > 0)
-					Colors.Add(item.name.Substring(0, item.name.Length - 6).ToLowerInvariant(), item.paint);
+					Colors.Add(name.Substring(0, name.Length - 6).ToLowerInvariant(), item.paint);
 			}
 			#endregion
 			#region Selections
@@ -463,9 +466,7 @@ namespace WorldEdit
 					if (!CommandQueue.TryTake(out command, -1, Cancel.Token))
 						return;
 					if (Main.rand == null)
-						Main.rand = new Random();
-					if (WorldGen.genRand == null)
-						WorldGen.genRand = new Random();
+						Main.rand = new UnifiedRandom();
 					command.Position();
 					command.Execute();
 				}

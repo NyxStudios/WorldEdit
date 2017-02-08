@@ -1,9 +1,10 @@
 ﻿using System;
+using OTAPI.Tile;
 using Terraria;
 
 namespace WorldEdit.Expressions
 {
-	public delegate bool Test(Tile tile);
+	public delegate bool Test(ITile tile);
 
 	public sealed class TestExpression : Expression
 	{
@@ -14,7 +15,7 @@ namespace WorldEdit.Expressions
 			Test = test;
 		}
 
-		public override bool Evaluate(Tile tile)
+		public override bool Evaluate(ITile tile)
 		{
 			return Test(tile);
 		}

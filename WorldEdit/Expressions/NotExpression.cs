@@ -1,4 +1,5 @@
 ﻿using System;
+using OTAPI.Tile;
 using Terraria;
 
 namespace WorldEdit.Expressions
@@ -10,7 +11,7 @@ namespace WorldEdit.Expressions
 			Left = expression;
 		}
 
-		public override bool Evaluate(Tile tile)
+		public override bool Evaluate(ITile tile)
 		{
 			return !Left.Evaluate(tile);
 		}
